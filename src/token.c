@@ -6,7 +6,7 @@
 #include "token.h"
 #include "xmalloc.h"
 
-void init_nodes(node *first);
+double *strtofpntr(char *str);
 
 calcualtion *create_calculation(int size) {
 
@@ -16,6 +16,7 @@ calcualtion *create_calculation(int size) {
     node *n = xmalloc(sizeof(node));
 
     calc->first = n;
+    n->type = 0;
     n->prev = NULL;
 
     node *p;
@@ -25,6 +26,7 @@ calcualtion *create_calculation(int size) {
         n->next = xmalloc(sizeof(node));
         p = n;
         n = n->next;
+        n->type = 0;
         n->prev = p;
     }
     n->next = NULL;
@@ -55,12 +57,42 @@ char *format_text(char *text) {
 
 }
 
+void init_calculation(calcualtion *calc, char *format_text) {
+
+    char *op;
+
+    node *n = calc->first;
+    while ((op = strpbrk(format_text, VALID_OPERATORS)) != NULL) {
+
+        int len = op - format_text;
+
+        if (len == 0) {
+            n->item = strndup(format_text, 1);
+            n->type = 2;
+            ++format_text;
+        } else {
+            n->item = strtofpntr(format_text);
+            n->type = 1;
+            format_text += len;
+        }
+        n = n->next;
+    }
+
+    if (format_text[0] != '\0') {
+        n->item = strtofpntr(format_text);
+        n->type = 1;
+    }
+
+}
+
 void free_calculation(calcualtion *calc) {
 
     node *n = calc->first;
     node *x;
     while (n != NULL) {
         x = n->next;
+        if (n->type != 0)
+            free(n->item);
         xfree(n);
         n = x;
 
@@ -68,4 +100,13 @@ void free_calculation(calcualtion *calc) {
 
     xfree(calc);
 
+}
+
+double *strtofpntr(char *str) {
+
+    double f = strtof(str, NULL);
+    double *fpntr = xmalloc(sizeof(double));
+    fpntr = memmove(fpntr, &f, sizeof(double));
+
+    return fpntr;
 }

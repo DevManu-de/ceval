@@ -8,10 +8,7 @@
 
 int main() {
 
-    char *a = "12345ab/-0x";
-    a = format_text(a);
-    puts(a);
-    xfree(a);
+    printf("%Lf\n", ceval("-1*2+3"));
 
     return 0;
 }
