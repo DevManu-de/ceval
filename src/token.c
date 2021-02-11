@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,35 +5,19 @@
 #include "token.h"
 #include "xmalloc.h"
 
+void calculation_append_node(calcualtion *calc, void *item, unsigned int type);
 double *strtofpntr(char *str);
+void free_node(calcualtion *calc, node *n);
 
-calcualtion *create_calculation(int size) {
+calcualtion *create_calculation() {
 
     calcualtion *calc = xmalloc(sizeof(calcualtion));
-    calc->length = size;
+    calc->length = 0;
 
-    node *n = xmalloc(sizeof(node));
-
-    calc->first = n;
-    n->type = 0;
-    n->prev = NULL;
-
-    node *p;
-
-    while (--size) {
-
-        n->next = xmalloc(sizeof(node));
-        p = n;
-        n = n->next;
-        n->type = 0;
-        n->prev = p;
-    }
-    n->next = NULL;
-
-    calc->last = n;
+    calc->first = NULL;
+    calc->last = NULL;
 
     return calc;
-
 
 }
 
@@ -57,30 +40,70 @@ char *format_text(char *text) {
 
 }
 
+void calculation_append_node(calcualtion *calc, void *item, unsigned int type) {
+
+
+    node *n = xmalloc(sizeof(node));
+    n->item = item;
+    n->type = type;
+    n->next = NULL;
+
+    if (calc->first == NULL) {
+
+        calc->first = n;
+        calc->last = n;
+        n->prev = NULL;
+
+    } else {
+
+        n->prev = calc->last;
+        calc->last->next = n;
+        calc->last = n;
+
+    }
+
+}
+
 void init_calculation(calcualtion *calc, char *format_text) {
 
     char *op;
 
-    node *n = calc->first;
     while ((op = strpbrk(format_text, VALID_OPERATORS)) != NULL) {
 
         int len = op - format_text;
 
         if (len == 0) {
-            n->item = strndup(format_text, 1);
-            n->type = 2;
+            calculation_append_node(calc, strndup(format_text, 1), IS_OPERATOR);
             ++format_text;
         } else {
-            n->item = strtofpntr(format_text);
-            n->type = 1;
+            calculation_append_node(calc, strtofpntr(format_text), IS_NUMBER);
             format_text += len;
         }
-        n = n->next;
     }
 
     if (format_text[0] != '\0') {
-        n->item = strtofpntr(format_text);
-        n->type = 1;
+        calculation_append_node(calc, strtofpntr(format_text), IS_NUMBER);
+    }
+
+}
+
+void prepare_calculation(calcualtion *calc) {
+
+    node *n = calc->first;
+
+    if (n->type == IS_OPERATOR) {
+        n = n->next;
+
+
+    }
+
+    while (n->type != IS_NULL) {
+        if (n->type == IS_OPERATOR) {
+
+
+
+        }
+        n = n->next;
     }
 
 }
@@ -91,14 +114,40 @@ void free_calculation(calcualtion *calc) {
     node *x;
     while (n != NULL) {
         x = n->next;
-        if (n->type != 0)
-            free(n->item);
+        xfree(n->item);
         xfree(n);
         n = x;
 
     }
 
     xfree(calc);
+
+}
+
+void free_node(calcualtion *calc, node *n) {
+
+    if (calc->first == n) {
+
+        calc->first = n->next;
+        xfree(n->item);
+        xfree(n);
+        calc->first->prev = NULL;
+
+    } else if (calc->last == n) {
+
+        calc->last = n->prev;
+        xfree(n->item);
+        xfree(n);
+        calc->last->next = NULL;
+
+    } else {
+
+        n->prev->next = n->next;
+        n->next->prev = n->prev;
+        xfree(n->item);
+        xfree(n);
+
+    }
 
 }
 

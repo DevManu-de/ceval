@@ -10,7 +10,7 @@
 long double ceval(char *text) {
 
     char *formatted_text = format_text(text);
-    calcualtion *clc = create_calculation(strlen(text));
+    calcualtion *clc = create_calculation();
     init_calculation(clc, formatted_text);
 
     node *n = clc->first;
