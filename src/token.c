@@ -6,6 +6,8 @@
 #include "xmalloc.h"
 
 void calculation_append_node(calcualtion *calc, void *item, unsigned int type);
+void solve_calculation_bracket_pair(calcualtion *calc, node *open, node *close);
+void solve_calculation_range(calcualtion *calc, node *start, node *end);
 double *strtofpntr(char *str);
 void free_node(calcualtion *calc, node *n);
 
@@ -13,6 +15,7 @@ calcualtion *create_calculation() {
 
     calcualtion *calc = xmalloc(sizeof(calcualtion));
     calc->length = 0;
+    calc->result = 0.0;
 
     calc->first = NULL;
     calc->last = NULL;
@@ -90,21 +93,36 @@ void init_calculation(calcualtion *calc, char *format_text) {
 void prepare_calculation(calcualtion *calc) {
 
     node *n = calc->first;
+    node *x;
 
-    if (n->type == IS_OPERATOR) {
-        n = n->next;
+    while (n != NULL) {
+        x = n->next;
+        if (n->type == IS_OPERATOR && ((char *) n->item)[0] == '-') {
+            if (n->next->type == IS_NUMBER) {
+                ((double *) n->next->item)[0] *= -1.0;
+                free_node(calc, n);
 
-
-    }
-
-    while (n->type != IS_NULL) {
-        if (n->type == IS_OPERATOR) {
-
-
+            }
 
         }
-        n = n->next;
+        n = x;
     }
+
+}
+
+void solve_calculation(calcualtion *calc) {
+
+
+
+}
+
+void solve_calculation_bracket_pair(calcualtion *calc, node *open, node *close) {
+
+
+}
+
+void solve_calculation_range(calcualtion *calc, node *start, node *end) {
+
 
 }
 

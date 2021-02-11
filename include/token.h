@@ -21,6 +21,7 @@ typedef struct _node {
 typedef struct _calculation {
 
     int length;
+    double result;
     struct _node *first;
     struct _node *last;
 
@@ -30,6 +31,7 @@ calcualtion *create_calculation();
 char *format_text(char *text);
 void init_calculation(calcualtion *calc, char *format_text);
 void prepare_calculation(calcualtion *calc);
+void solve_calculation(calcualtion *calc);
 void free_calculation(calcualtion *calc);
 
 #endif

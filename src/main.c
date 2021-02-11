@@ -8,7 +8,7 @@
 
 int main() {
 
-    printf("%Lf\n", ceval("-1*2+3"));
+    printf("%f\n", ceval("-1*2-3/553 -99+ 7"));
 
     return 0;
 }
