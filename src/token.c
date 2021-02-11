@@ -38,7 +38,6 @@ calcualtion *create_calculation(int size) {
 
 char *format_text(char *text) {
 
-
     int tlen = strlen(text);
 
     char* format_text = xmalloc(sizeof(char) * tlen + 1);
@@ -49,7 +48,9 @@ char *format_text(char *text) {
         if (strchr(VALID_CHARS, text[i]))
             format_text[ftlen++] = text[i];
 
+    format_text[ftlen] = '\0';
     format_text = xrealloc(format_text, strlen(format_text) + 1);
+
     return format_text;
 
 }
