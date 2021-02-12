@@ -2,8 +2,6 @@
 #include <stdio.h>
 
 #include "ceval.h"
-#include "token.h"
-#include "xmalloc.h"
 
 
 int main() {
