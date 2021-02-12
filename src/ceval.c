@@ -15,20 +15,11 @@ double ceval(char *text) {
     format_calculation(clc);
     solve_calculation(clc);
 
-    //node *n = clc->first;
-    //while (n != NULL && n->type != IS_NULL) {
-    //    if (n->type == IS_NUMBER)
-    //        printf("%f\n", ((double *) n->item)[0]);
-    //    else
-    //        puts(n->item);
-    //    n = n->next;
-    //}
-
     double result = clc->result;
 
     xfree(formatted_text);
     free_calculation(clc);
 
-    return result;
+    return result == 0 ? 0 : result;
 
 }

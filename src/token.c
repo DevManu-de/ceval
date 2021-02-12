@@ -12,7 +12,7 @@ void solve_division(calcualtion *calc, node *num1, node *num2);
 void solve_multiplication(calcualtion *calc, node *num1, node *num2);
 void solve_addition(calcualtion *calc, node *num1, node *num2);
 void solve_substraction(calcualtion *calc, node *num1, node *num2);
-node *find_node(calcualtion *calc, void *item, int type, int direction);
+node *find_node(node *start, void *item, int type, int direction);
 double *strtofpntr(char *str);
 void free_node(calcualtion *calc, node *n);
 
@@ -39,9 +39,11 @@ char *format_text(char *text) {
     int ftlen = 0;
 
     int i;
-    for (i = 0; i < tlen; ++i)
-        if (strchr(VALID_CHARS, text[i]))
+    for (i = 0; i < tlen; ++i) {
+        if (strchr(VALID_CHARS, text[i])) {
             format_text[ftlen++] = text[i];
+        }
+    }
 
     format_text[ftlen] = '\0';
     format_text = xrealloc(format_text, strlen(format_text) + 1);
@@ -127,7 +129,7 @@ void solve_calculation(calcualtion *calc) {
     node *open;
     node *close;
 
-    while ((open = find_node(calc, "(", IS_OPERATOR, BACKWARDS)) != NULL && (close = find_node(calc, ")", IS_OPERATOR, FORWARD)) != NULL) {
+    while ((close = find_node(calc->first, ")", IS_OPERATOR, FORWARD)) != NULL && (open = find_node(close, "(", IS_OPERATOR, BACKWARDS)) != NULL) {
         solve_calculation_bracket_pair(calc, open, close);
     }
 
@@ -166,11 +168,11 @@ void solve_calculation_range(calcualtion *calc, node *start, node *end) {
         synclasts = 1;
 
     node *n;
-    while ((n = find_node(c, "/", IS_OPERATOR, FORWARD)) != NULL) {
+    while ((n = find_node(c->first, "/", IS_OPERATOR, FORWARD)) != NULL) {
         solve_division(c, n->prev, n->next);
     }
 
-    while ((n = find_node(c, "*", IS_OPERATOR, FORWARD)) != NULL) {
+    while ((n = find_node(c->first, "*", IS_OPERATOR, FORWARD)) != NULL) {
         solve_multiplication(c, n->prev, n->next);
 
     }
@@ -241,12 +243,11 @@ void solve_addition(calcualtion *calc, node *num1, node *num2) {
 
 }
 
-node *find_node(calcualtion *calc, void *item, int type, int direction) {
+node *find_node(node *start, void *item, int type, int direction) {
 
-    node *n;
+    node *n = start;
 
     if (direction == FORWARD) {
-        n = calc->first;
 
         while (n != NULL) {
             if (memcmp(n->item, item, type == IS_NUMBER ? sizeof(double) : 1) == 0) {
@@ -257,7 +258,6 @@ node *find_node(calcualtion *calc, void *item, int type, int direction) {
         return NULL;
 
     } else {
-        n = calc->last;
         while (n != NULL) {
             if (memcmp(n->item, item, type == IS_NUMBER ? sizeof(double) : 1) == 0) {
                 return n;
