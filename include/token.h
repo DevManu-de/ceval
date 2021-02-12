@@ -9,6 +9,9 @@
 #define IS_OPERATOR 2
 #define IS_NULL 0
 
+#define FORWARD 1
+#define BACKWARDS -1
+
 typedef struct _node {
 
     unsigned int type : 2;

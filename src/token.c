@@ -12,7 +12,7 @@ void solve_division(calcualtion *calc, node *num1, node *num2);
 void solve_multiplication(calcualtion *calc, node *num1, node *num2);
 void solve_addition(calcualtion *calc, node *num1, node *num2);
 void solve_substraction(calcualtion *calc, node *num1, node *num2);
-node *find_node(calcualtion *calc, void *item, int type);
+node *find_node(calcualtion *calc, void *item, int type, int direction);
 double *strtofpntr(char *str);
 void free_node(calcualtion *calc, node *n);
 
@@ -124,20 +124,12 @@ void format_calculation(calcualtion *calc) {
 
 void solve_calculation(calcualtion *calc) {
 
+    node *open;
     node *close;
 
-    while ((close = find_node(calc, ")", IS_OPERATOR)) != NULL) {
 
-        node *open = close->prev;
-        while (open != NULL) {
-            if (memcmp(open->item, "(", 1) == 0) {
-                solve_calculation_bracket_pair(calc, open, close);
-                break;
-            }
-            open = open->prev;
-        }
-        print_calculator(calc);
-
+    while ((open = find_node(calc, "(", IS_OPERATOR, BACKWARDS)) != NULL && (close = find_node(calc, ")", IS_OPERATOR, FORWARD)) != NULL) {
+        solve_calculation_bracket_pair(calc, open, close);
     }
 
     solve_calculation_range(calc, calc->first, calc->last);
@@ -172,22 +164,26 @@ void solve_calculation_range(calcualtion *calc, node *start, node *end) {
     if (c->last == calc->last)
         synclasts = 1;
 
+    print_calculator(c);
+
     node *n;
-    while ((n = find_node(c, "/", IS_OPERATOR)) != NULL) {
+    while ((n = find_node(c, "/", IS_OPERATOR, FORWARD)) != NULL) {
         solve_division(c, n->prev, n->next);
     }
+    print_calculator(c);
 
-    while ((n = find_node(c, "*", IS_OPERATOR)) != NULL) {
+    while ((n = find_node(c, "*", IS_OPERATOR, FORWARD)) != NULL) {
         solve_multiplication(c, n->prev, n->next);
 
     }
+    print_calculator(c);
 
     n = c->first;
     while (n != NULL && n->type == IS_NUMBER && n->next != NULL && n->next->type == IS_NUMBER) {
 
         solve_addition(c, n, n->next);
-        n = n->next;
     }
+    print_calculator(c);
 
     if (syncfirsts)
         calc->first = c->first;
@@ -245,20 +241,13 @@ void solve_addition(calcualtion *calc, node *num1, node *num2) {
 
 }
 
-node *find_node(calcualtion *calc, void *item, int type) {
+node *find_node(calcualtion *calc, void *item, int type, int direction) {
 
-    node *n = calc->first;
+    node *n;
 
-    if (type == IS_NULL) {
-        while (n != NULL) {
-            if (n->item == NULL && n->type == type) {
-                return n;
-            }
-            n = n->next;
-        }
-        return NULL;
+    if (direction == FORWARD) {
+        n = calc->first;
 
-    } else {
         while (n != NULL) {
             if (memcmp(n->item, item, type == IS_NUMBER ? sizeof(double) : 1) == 0) {
                 return n;
@@ -267,8 +256,17 @@ node *find_node(calcualtion *calc, void *item, int type) {
         }
         return NULL;
 
-    }
+    } else {
+        n = calc->last;
+        while (n != NULL) {
+            if (memcmp(n->item, item, type == IS_NUMBER ? sizeof(double) : 1) == 0) {
+                return n;
+            }
+            n = n->prev;
+        }
+        return NULL;
 
+    }
 }
 
 void free_calculation(calcualtion *calc) {
