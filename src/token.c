@@ -127,7 +127,6 @@ void solve_calculation(calcualtion *calc) {
     node *open;
     node *close;
 
-
     while ((open = find_node(calc, "(", IS_OPERATOR, BACKWARDS)) != NULL && (close = find_node(calc, ")", IS_OPERATOR, FORWARD)) != NULL) {
         solve_calculation_bracket_pair(calc, open, close);
     }
@@ -155,6 +154,8 @@ void solve_calculation_range(calcualtion *calc, node *start, node *end) {
     calcualtion *c = xmalloc(sizeof(calcualtion));
     c->first = start;
     c->last = end;
+    node *afterend = end->next;
+    end->next = NULL;
 
     int syncfirsts = 0;
     int synclasts = 0;
@@ -164,32 +165,31 @@ void solve_calculation_range(calcualtion *calc, node *start, node *end) {
     if (c->last == calc->last)
         synclasts = 1;
 
-    print_calculator(c);
-
     node *n;
     while ((n = find_node(c, "/", IS_OPERATOR, FORWARD)) != NULL) {
         solve_division(c, n->prev, n->next);
     }
-    print_calculator(c);
 
     while ((n = find_node(c, "*", IS_OPERATOR, FORWARD)) != NULL) {
         solve_multiplication(c, n->prev, n->next);
 
     }
-    print_calculator(c);
 
     n = c->first;
     while (n != NULL && n->type == IS_NUMBER && n->next != NULL && n->next->type == IS_NUMBER) {
 
         solve_addition(c, n, n->next);
     }
-    print_calculator(c);
 
     if (syncfirsts)
         calc->first = c->first;
     if (synclasts)
         calc->last = c->last;
 
+    c->last->next = afterend;
+    if (afterend != NULL) {
+        c->last->next->prev = c->last;
+    }
     xfree(c);
 
 }
