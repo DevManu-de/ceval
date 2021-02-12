@@ -9,7 +9,7 @@
 int main() {
 
     //printf("%f\n", ceval("(-(1*2-(-3)/553) -99)+ 7"));
-    printf("%f\n", ceval("2*7/2"));
+    printf("%f\n", ceval("2*7/1.5 * 1.4"));
 
     return 0;
 }
