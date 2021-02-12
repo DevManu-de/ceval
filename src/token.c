@@ -12,7 +12,7 @@ void solve_division(calcualtion *calc, node *num1, node *num2);
 void solve_multiplication(calcualtion *calc, node *num1, node *num2);
 void solve_addition(calcualtion *calc, node *num1, node *num2);
 void solve_substraction(calcualtion *calc, node *num1, node *num2);
-node *finde_node(calcualtion *calc, void *item, int type);
+node *find_node(calcualtion *calc, void *item, int type);
 double *strtofpntr(char *str);
 void free_node(calcualtion *calc, node *n);
 
@@ -22,6 +22,7 @@ calcualtion *create_calculation() {
 
     calcualtion *calc = xmalloc(sizeof(calcualtion));
     calc->result = 0.0;
+    calc->length = 0;
 
     calc->first = NULL;
     calc->last = NULL;
@@ -56,6 +57,7 @@ void calculation_append_node(calcualtion *calc, void *item, unsigned int type) {
     n->item = item;
     n->type = type;
     n->next = NULL;
+    ++calc->length;
 
     if (calc->first == NULL) {
 
@@ -124,12 +126,7 @@ void solve_calculation(calcualtion *calc) {
 
     node *close;
 
-    while ((close = finde_node(calc, ")", IS_OPERATOR)) != NULL) {
-
-        static int i = 0;
-        print_calculator(calc);
-        if (i == 2)
-            exit(0);
+    while ((close = find_node(calc, ")", IS_OPERATOR)) != NULL) {
 
         node *open = close->prev;
         while (open != NULL) {
@@ -141,7 +138,6 @@ void solve_calculation(calcualtion *calc) {
         }
         print_calculator(calc);
 
-        ++i;
     }
 
     solve_calculation_range(calc, calc->first, calc->last);
@@ -168,20 +164,35 @@ void solve_calculation_range(calcualtion *calc, node *start, node *end) {
     c->first = start;
     c->last = end;
 
+    int syncfirsts = 0;
+    int synclasts = 0;
+
+    if (c->first == calc->first)
+        syncfirsts = 1;
+    if (c->last == calc->last)
+        synclasts = 1;
+
     node *n;
-    while ((n = finde_node(c, "/", IS_OPERATOR)) != NULL) {
-        solve_division(calc, n->prev, n->next);
+    while ((n = find_node(c, "/", IS_OPERATOR)) != NULL) {
+        solve_division(c, n->prev, n->next);
     }
 
-    while ((n = finde_node(c, "*", IS_OPERATOR)) != NULL) {
-        solve_multiplication(calc, n->prev, n->next);
+    while ((n = find_node(c, "*", IS_OPERATOR)) != NULL) {
+        solve_multiplication(c, n->prev, n->next);
 
     }
 
-    //while (c->first->type == IS_NUMBER && n->next->type == IS_NUMBER) {
-    //    solve_addition(c, n, n->next);
-    //    n = n->next;
-    //}
+    n = c->first;
+    while (n != NULL && n->type == IS_NUMBER && n->next != NULL && n->next->type == IS_NUMBER) {
+
+        solve_addition(c, n, n->next);
+        n = n->next;
+    }
+
+    if (syncfirsts)
+        calc->first = c->first;
+    if (synclasts)
+        calc->last = c->last;
 
     xfree(c);
 
@@ -227,14 +238,14 @@ void solve_addition(calcualtion *calc, node *num1, node *num2) {
     xfree(num1->item);
 
     num1->item = xmalloc(sizeof(double));
-    memmove(num1, &sum, sizeof(double));
+    memmove(num1->item, &sum, sizeof(double));
 
     num1->type = IS_NUMBER;
     free_node(calc, num2);
 
 }
 
-node *finde_node(calcualtion *calc, void *item, int type) {
+node *find_node(calcualtion *calc, void *item, int type) {
 
     node *n = calc->first;
 
@@ -300,6 +311,8 @@ void free_node(calcualtion *calc, node *n) {
         xfree(n);
 
     }
+
+    --calc->length;
 
 }
 

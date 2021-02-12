@@ -21,6 +21,7 @@ typedef struct _node {
 typedef struct _calculation {
 
     double result;
+    unsigned int length;
     struct _node *first;
     struct _node *last;
 
