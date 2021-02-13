@@ -278,6 +278,7 @@ void solve_division(calcualtion *calc, node *num1, node *num2) {
 
 }
 
+/* Solves a multiplication of two numbers */
 void solve_multiplication(calcualtion *calc, node *num1, node *num2) {
 /* node *num1 is the number left of the multiplication symbol */
 /* node *num2 is the number right of the multiplication symbol */
@@ -297,6 +298,7 @@ void solve_multiplication(calcualtion *calc, node *num1, node *num2) {
 
 }
 
+/* Solves a addition / division of two numbers */
 void solve_addition(calcualtion *calc, node *num1, node *num2) {
 /* node *num1 is the number left of the addition symbol */
 /* node *num2 is the number right of the addition symbol */
@@ -314,32 +316,38 @@ void solve_addition(calcualtion *calc, node *num1, node *num2) {
 
 }
 
+/* Searches for a node in the given direction from node *start */
 node *find_node(node *start, void *item, int type, int direction) {
-
-    node *n = start;
+/* node *start is the note to start searching from */
+/* void *item is the item the node to look for has to match */
+/* int type is the type the node to look for has to match*/
+/* int direction is the direction from where the node should be from start
+ * BACKWARDS means search left from start
+ * FORWARD means to search right from start*/
+/* Returns the first occurence of a node that matches all criteria */
 
     if (direction == FORWARD) {
-
-        while (n != NULL) {
-            if (memcmp(n->item, item, type == IS_NUMBER ? sizeof(double) : 1) == 0) {
-                return n;
+        while (start != NULL) {
+            if (memcmp(start->item, item, type == IS_NUMBER ? sizeof(double) : 1) == 0) {
+                return start;
             }
-            n = n->next;
+            start = start->next;
         }
         return NULL;
 
     } else {
-        while (n != NULL) {
-            if (memcmp(n->item, item, type == IS_NUMBER ? sizeof(double) : 1) == 0) {
-                return n;
+        while (start != NULL) {
+            if (memcmp(start->item, item, type == IS_NUMBER ? sizeof(double) : 1) == 0) {
+                return start;
             }
-            n = n->prev;
+            start = start->prev;
         }
         return NULL;
 
     }
 }
 
+/* Frees a entire calculation with all nodes and the nodes content */
 void free_calculation(calcualtion *calc) {
 
     node *n = calc->first;
@@ -356,8 +364,10 @@ void free_calculation(calcualtion *calc) {
 
 }
 
+/* Frees a single node and all of its content */
 void free_node(calcualtion *calc, node *n) {
 
+    /* If node to be freed is the first in the calculation */
     if (calc->first == n) {
 
         calc->first = n->next;
@@ -366,6 +376,7 @@ void free_node(calcualtion *calc, node *n) {
         calc->first->prev = NULL;
 
     } else if (calc->last == n) {
+    /* If node to be freed is the last in the calculation */
 
         calc->last = n->prev;
         xfree(n->item);
@@ -373,6 +384,7 @@ void free_node(calcualtion *calc, node *n) {
         calc->last->next = NULL;
 
     } else {
+    /* If node to be freed is somewhere in the calculation */
 
         n->prev->next = n->next;
         n->next->prev = n->prev;
@@ -385,6 +397,7 @@ void free_node(calcualtion *calc, node *n) {
 
 }
 
+/* Converts a string to a double pointer */
 double *strtofpntr(char *str) {
 
     double f = strtof(str, NULL);
@@ -394,6 +407,8 @@ double *strtofpntr(char *str) {
     return fpntr;
 }
 
+/* Only used for debugging */
+/* Prints an entire calculation */
 void print_calculator(calcualtion *calc) {
 
     puts("\n\n\n");
