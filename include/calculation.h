@@ -1,5 +1,5 @@
-#ifndef _TOKEN_H
-#define _TOKEN_H
+#ifndef _CALCULATION_H
+#define _CALCULATION_H
 
 #define VALID_CHARS "0123456789+-*/()."
 #define VALID_NUMBERS "0123456789"
@@ -10,7 +10,7 @@
 #define IS_NULL 0
 
 #define FORWARD 1
-#define BACKWARDS -1
+#define BACKWARD -1
 
 typedef struct _node {
 

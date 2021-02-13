@@ -4,7 +4,7 @@
 
 
 #include "ceval.h"
-#include "token.h"
+#include "calculation.h"
 #include "xmalloc.h"
 
 double ceval(char *text) {
@@ -20,6 +20,7 @@ double ceval(char *text) {
     xfree(formatted_text);
     free_calculation(clc);
 
+    /* Sometimes -0 is returnd and this changes it to 0 */
     return result == 0 ? 0 : result;
 
 }

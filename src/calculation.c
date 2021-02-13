@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "token.h"
+#include "calculation.h"
 #include "xmalloc.h"
 
 
@@ -172,7 +172,7 @@ void solve_calculation(calcualtion *calc) {
 
     /* Locate the first closing bracket and then go back the first opening bracken.
      * This ensures that the two brackets found are in the right order. */
-    while ((close = find_node(calc->first, ")", IS_OPERATOR, FORWARD)) != NULL && (open = find_node(close, "(", IS_OPERATOR, BACKWARDS)) != NULL) {
+    while ((close = find_node(calc->first, ")", IS_OPERATOR, FORWARD)) != NULL && (open = find_node(close, "(", IS_OPERATOR, BACKWARD)) != NULL) {
         solve_calculation_bracket_pair(calc, open, close);
     }
 
@@ -322,7 +322,7 @@ node *find_node(node *start, void *item, int type, int direction) {
 /* void *item is the item the node to look for has to match */
 /* int type is the type the node to look for has to match*/
 /* int direction is the direction from where the node should be from start
- * BACKWARDS means search left from start
+ * BACKWARD means search left from start
  * FORWARD means to search right from start*/
 /* Returns the first occurence of a node that matches all criteria */
 
