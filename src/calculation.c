@@ -23,6 +23,8 @@ void solve_addition(calcualtion *calc, node *num1, node *num2);
 node *find_node(node *start, void *item, int type, int direction);
 /* Converts a string to a double pointer */
 double *strtofpntr(char *str);
+/* Replaces the content of a node */
+void replace_node(node *n, void *item, int type);
 /* Frees a node and sets the pointers */
 void free_node(calcualtion *calc, node *n);
 
@@ -267,10 +269,7 @@ void solve_division(calcualtion *calc, node *num1, node *num2) {
 
     /* Replace operator with the calculated number */
     node *operator = num1->next;
-    xfree(operator->item);
-    operator->item = xmalloc(sizeof(double));
-    memmove(operator->item, &product, sizeof(double));
-    operator->type = IS_NUMBER;
+    replace_node(operator, &product, IS_NUMBER);
 
     /* Frees both unneded numbers */
     free_node(calc, num1);
@@ -287,10 +286,7 @@ void solve_multiplication(calcualtion *calc, node *num1, node *num2) {
 
     /* Replace operator with the calculated number */
     node *operator = num1->next;
-    xfree(operator->item);
-    operator->item = xmalloc(sizeof(double));
-    memmove(operator->item, &product, sizeof(double));
-    operator->type = IS_NUMBER;
+    replace_node(operator, &product, IS_NUMBER);
 
     /* Frees both unneeded numbers */
     free_node(calc, num1);
@@ -306,10 +302,7 @@ void solve_addition(calcualtion *calc, node *num1, node *num2) {
     double sum = ((double *) num1->item)[0] + ((double *) num2->item)[0];
 
     /* Replace first number (num1) with the calculated number */
-    xfree(num1->item);
-    num1->item = xmalloc(sizeof(double));
-    memmove(num1->item, &sum, sizeof(double));
-    num1->type = IS_NUMBER;
+    replace_node(num1, &sum, IS_NUMBER);
 
     /* Frees unneeded number */
     free_node(calc, num2);
@@ -361,6 +354,33 @@ void free_calculation(calcualtion *calc) {
     }
 
     xfree(calc);
+
+}
+
+void replace_node(node *n, void *item, int type) {
+
+    /* Free the current item */
+    xfree(n->item);
+    /* Choose what new item is */
+    switch (type) {
+
+        case IS_NUMBER:
+            n->item = xmalloc(sizeof(double));
+            memmove(n->item, item, sizeof(double));
+            break;
+        case IS_OPERATOR:
+            n->item = xmalloc(sizeof(char) + 1);
+            memmove(n->item, item, 1);
+            ((char *) n->item)[1] = '\0';
+            break;
+
+        default:
+            n->item = NULL;
+            break;
+
+    }
+
+    n->type = type;
 
 }
 
