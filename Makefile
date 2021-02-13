@@ -34,6 +34,7 @@ $(MAIN): $(OBJECTS)
 .PHONY: clean
 clean:
 	$(RM) $(OUTPUTMAIN)
+	$(RM) $(OUTPUT)/libceval.a
 	$(RM) $(call FIXPATH,$(OBJECTS))
 	@echo Cleanup complete!
 
