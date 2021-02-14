@@ -15,7 +15,7 @@ Currently supported operands are
 5. \-
 
 this is also the way they are executed.
-This also allows full floating point numbers.
+This also allows floating point numbers but not numbers like `1E-3` or `1E5`.
 
 ## Usage
 
