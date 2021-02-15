@@ -9,14 +9,20 @@
 
 double ceval(char *text) {
 
+    /* First format text to simplifly for parsing later */
     char *formatted_text = format_text(text);
+    /* Creates an empty calculation */
     calcualtion *clc = create_calculation();
+    /* Convert text into a doubly linked list */
     init_calculation(clc, formatted_text);
+    /* Handle signs of numbers */
     format_calculation(clc);
+    /* Solve the calculation and saves result in result */
     solve_calculation(clc);
 
     double result = clc->result;
 
+    /* Free everything */
     xfree(formatted_text);
     free_calculation(clc);
 
