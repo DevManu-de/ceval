@@ -30,7 +30,7 @@ void free_node(calcualtion *calc, node *n);
 
 /* Functions for debugging */
 /* Prints a calculation */
-void print_calculator(calcualtion *calc);
+void print_calculation(calcualtion *calc);
 
 
 /* Create an empty calculation without nodes */
@@ -150,7 +150,7 @@ void format_calculation(calcualtion *calc) {
     while (n != NULL) {
         x = n->next;
         if (n->type == IS_OPERATOR && ((char *) n->item)[0] == '-') {
-            if (n->next->type == IS_NUMBER) {
+            if (n->next != NULL && n->next->type == IS_NUMBER) {
                 ((double *) n->next->item)[0] *= -1.0;
                 free_node(calc, n);
 
@@ -429,7 +429,7 @@ double *strtofpntr(char *str) {
 
 /* Only used for debugging */
 /* Prints an entire calculation */
-void print_calculator(calcualtion *calc) {
+void print_calculation(calcualtion *calc) {
 
     puts("\n\n\n");
 
