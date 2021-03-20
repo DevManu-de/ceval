@@ -1,6 +1,6 @@
-#ifndef _CEVAL_H
-#define _CEVAL_H
+#ifndef _ceval_H
+#define _ceval_H
 
-double ceval(char *text);
+double ceval(char *_calc_);
 
 #endif

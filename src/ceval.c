@@ -1,32 +1,27 @@
-
-#include <stdio.h>
-#include <string.h>
-
-
 #include "ceval.h"
-#include "calculation.h"
-#include "xmalloc.h"
 
-double ceval(char *text) {
+#include "doublist.h"
 
-    /* First format text to simplifly for parsing later */
-    char *formatted_text = format_text(text);
-    /* Creates an empty calculation */
-    calcualtion *clc = create_calculation();
-    /* Convert text into a doubly linked list */
-    init_calculation(clc, formatted_text);
-    /* Handle signs of numbers */
-    format_calculation(clc);
-    /* Solve the calculation and saves result in result */
-    solve_calculation(clc);
+#define VALID_CHARS "0123456789+-*/()."
+#define VALID_NUMBERS "0123456789"
+#define VALID_OPERATORS "+-*/()"
 
-    double result = clc->result;
+#define IS_NUMBER 1
+#define IS_OPERATOR 2
+#define IS_NULL 0
 
-    /* Free everything */
-    xfree(formatted_text);
-    free_calculation(clc);
+typedef struct doublist calcualtion;
 
-    /* Sometimes -0 is returnd and this changes it to 0 */
-    return result == 0 ? 0 : result;
+calcualtion *create_calculation();
+char *format_text(char *text);
+void init_calculation(calcualtion *calc, char *format_text);
+void format_calculation(calcualtion *calc);
+void solve_calculation(calcualtion *calc);
+void free_calculation(calcualtion *calc);
+
+double ceval(char *_calc_) {
+
+    return 0;
 
 }
+
