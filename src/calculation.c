@@ -64,12 +64,10 @@ void init_calculation(struct doublist *calc, char *format_text) {
         /* If an operator is at the beginning of the calculation */
         if (len == 0) {
             node_insert_after(calc, NULL, node_create(strndup(format_text, 1), IS_OPERATOR));
-            //calculation_append_node(calc, strndup(format_text, 1), IS_OPERATOR);
             ++format_text;
         } else {
             /* The next part of the string is a number */
             node_insert_after(calc, NULL, node_create(strtofpntr(format_text), IS_NUMBER));
-            //calculation_append_node(calc, strtofpntr(format_text), IS_NUMBER);
             format_text += len;
         }
     }
@@ -77,7 +75,6 @@ void init_calculation(struct doublist *calc, char *format_text) {
     /* Append the last number if one exists after the last operator */
     if (format_text[0] != '\0') {
         node_insert_after(calc, NULL, node_create(strtofpntr(format_text), IS_NUMBER));
-        //calculation_append_node(calc, strtofpntr(format_text), IS_NUMBER);
     }
 
 }
@@ -124,9 +121,6 @@ void solve_calculation(struct doublist *calc) {
 
     /* Locate the first closing bracket and then go back the first opening bracken.
      * This ensures that the two brackets found are in the right order. */
-    //while ((close = find_node(calc->first, ")", IS_OPERATOR, FORWARD)) != NULL && (open = find_node(close, "(", IS_OPERATOR, BACKWARD)) != NULL) {
-    //    solve_calculation_bracket_pair(calc, open, close);
-    //}
     while ((close = node_find(calc, calc->head, ")", IS_OPERATOR, 1, FORWARD)) != NULL && (open = node_find(calc, close, "(", IS_OPERATOR, 1, BACKWARD)) != NULL) {
         solve_calculation_bracket_pair(calc, open, close);
     }
@@ -134,7 +128,6 @@ void solve_calculation(struct doublist *calc) {
     /* After all brackets are calculated only the last nodes need to be calculated */
     solve_calculation_range(calc, calc->head, calc->tail);
     /* solve_calculation_range leaves one node with the result */
-    //calc->result = ((double *) calc->head->vaue)[0];
 
 }
 
@@ -180,17 +173,11 @@ void solve_calculation_range(struct doublist *calc, struct node *start, struct n
 
     /* Find the first division in the sub-calculation */
     struct node *n;
-    //while ((n = find_node(c->first, "/", IS_OPERATOR, FORWARD)) != NULL) {
-    //    solve_division(c, n->prev, n->next);
-    //}
     while ((n = node_find(c, c->head, "/", IS_OPERATOR, 1, FORWARD)) != NULL) {
         solve_division(c, n->prev, n->next);
     }
 
     /* Find the first multiplication of the sub-calculation */
-    //while ((n = find_node(c->first, "*", IS_OPERATOR, FORWARD)) != NULL) {
-    //    solve_multiplication(c, n->prev, n->next);
-    //}
     while ((n = node_find(c, c->head, "*", IS_OPERATOR, 1, FORWARD)) != NULL) {
         solve_multiplication(c, n->prev, n->next);
     }
@@ -227,7 +214,6 @@ void solve_division(struct doublist *calc, struct node *num1, struct node *num2)
 
     /* Replace operator with the calculated number */
     struct node *operator = num1->next;
-    //replace_node(operator, &product, IS_NUMBER);
     node_modify(calc, operator, node_create(xmemdup(&product, sizeof(product)), IS_NUMBER), sizeof(product), 1);
 
     /* Frees both unneded numbers */
@@ -245,7 +231,6 @@ void solve_multiplication(struct doublist *calc, struct node *num1, struct node 
 
     /* Replace operator with the calculated number */
     struct node *operator = num1->next;
-    //replace_node(operator, &product, IS_NUMBER);
     node_modify(calc, operator, node_create(xmemdup(&product, sizeof(product)), IS_NUMBER), sizeof(product), 1);
 
     /* Frees both unneeded numbers */
@@ -263,7 +248,6 @@ void solve_addition(struct doublist *calc, struct node *num1, struct node *num2)
 
     /* Replace first number (num1) with the calculated number */
     node_modify(calc, num1, node_create(xmemdup(&sum, sizeof(sum)), IS_NUMBER), sizeof(sum), 1);
-    //replace_node(num1, &sum, IS_NUMBER);
 
     /* Frees unneeded number */
     node_free(calc, num2);
