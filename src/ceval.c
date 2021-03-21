@@ -16,7 +16,6 @@ void print_calculation(struct doublist *list);
 char *format_text(char *text);
 void init_calculation(struct doublist *calc, char *formatted_test);
 void format_calculation(struct doublist *calc);
-void check_brackets(struct doublist *calc);
 
 void solve_calculation(struct doublist *calc);
 void solve_calculation_bracket_pair(struct doublist *calc, struct node *open, struct node *close);
@@ -31,7 +30,6 @@ double ceval(char *_calc_) {
     char *formatted_test = format_text(_calc_);
     init_calculation(calc, formatted_test);
     xfree(formatted_test);
-//    check_brackets(calc);
     solve_calculation(calc);
 
     double solution = ((double *) calc->head->value)[0];
@@ -89,25 +87,6 @@ void init_calculation(struct doublist *calc, char *formatted_test) {
 
 }
 
-void check_brackets(struct doublist *calc) {
-
-    struct node *n;
-    while ((n = node_find(calc, calc->head, ")", IS_OPERATOR, 1, FORWARD)) != NULL) {
-        if (node_find(calc, n, "(", IS_OPERATOR, 1, BACKWARD) == NULL) {
-            node_free(calc, n);
-        }
-    }
-
-    while ((n = node_find(calc, calc->tail, "(", IS_OPERATOR, 1, BACKWARD)) != NULL) {
-        if (node_find(calc, n, ")", IS_OPERATOR, 1, FORWARD) == NULL) {
-            node_free(calc, n);
-        } else if (n->prev != NULL && n->prev->type == IS_NUMBER) {
-            node_insert_before(calc, n, node_create(strndup("*", 1), IS_OPERATOR));
-        }
-    }
-
-}
-
 void solve_calculation(struct doublist *calc) {
 
     struct node *open;
@@ -139,10 +118,6 @@ void solve_calculation_range(struct doublist *calc, struct node *start, struct n
 
     struct node *afterend = end->next;
     end->next = NULL;
-
-    //struct doublist *tmplist = doublist_create();
-    //tmplist->head = start;
-    //tmplist->tail = end;
 
     struct node *n;
     while ((n = node_find(calc, start, "/", IS_OPERATOR, 1, FORWARD)) != NULL) {
