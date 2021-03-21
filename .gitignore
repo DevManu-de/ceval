@@ -1,4 +1,3 @@
-
 output/*
 *.o
 *.a
@@ -9,4 +8,6 @@ output/*
 *.exe
 vgcore.*
 tags
+cscope.out
 
+test/test
