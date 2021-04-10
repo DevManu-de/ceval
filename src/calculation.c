@@ -20,11 +20,6 @@ void solve_addition(struct doublist *calc, struct node *num1, struct node *num2)
 /* Converts a string to a double pointer */
 double *strtofpntr(char *str);
 
-/* Functions for debugging */
-/* Prints a calculation */
-void print_calculation(struct doublist *calc);
-
-
 /* Formats the text and removes unneeded characters */
 char *format_text(char *text) {
 
@@ -63,18 +58,18 @@ void init_calculation(struct doublist *calc, char *format_text) {
 
         /* If an operator is at the beginning of the calculation */
         if (len == 0) {
-            node_insert_after(calc, NULL, node_create(strndup(format_text, 1), IS_OPERATOR));
+            node_insert_after(calc, NULL, node_create(strndup(format_text, 1), STRING_TYPE));
             ++format_text;
         } else {
             /* The next part of the string is a number */
-            node_insert_after(calc, NULL, node_create(strtofpntr(format_text), IS_NUMBER));
+            node_insert_after(calc, NULL, node_create(strtofpntr(format_text), DOUBLE_TYPE));
             format_text += len;
         }
     }
 
     /* Append the last number if one exists after the last operator */
     if (format_text[0] != '\0') {
-        node_insert_after(calc, NULL, node_create(strtofpntr(format_text), IS_NUMBER));
+        node_insert_after(calc, NULL, node_create(strtofpntr(format_text), DOUBLE_TYPE));
     }
 
 }
@@ -96,15 +91,15 @@ void format_calculation(struct doublist *calc) {
 
     while (n != NULL) {
         x = n->next;
-        if (n->type == IS_OPERATOR && ((char *) n->value)[0] == '-') {
-            if (n->next != NULL && n->next->type == IS_NUMBER) {
+        if (n->type == STRING_TYPE && ((char *) n->value)[0] == '-') {
+            if (n->next != NULL && n->next->type == DOUBLE_TYPE) {
                 ((double *) n->next->value)[0] *= -1.0;
                 node_free(calc, n);
 
             }
 
-        } else if (n->type == IS_OPERATOR && ((char *) n->value)[0] == '+') {
-            if (n->next->type == IS_NUMBER) {
+        } else if (n->type == STRING_TYPE && ((char *) n->value)[0] == '+') {
+            if (n->next->type == DOUBLE_TYPE) {
                 node_free(calc, n);
             }
         }
@@ -121,7 +116,7 @@ void solve_calculation(struct doublist *calc) {
 
     /* Locate the first closing bracket and then go back the first opening bracken.
      * This ensures that the two brackets found are in the right order. */
-    while ((close = node_find(calc, calc->head, ")", IS_OPERATOR, 1, FORWARD)) != NULL && (open = node_find(calc, close, "(", IS_OPERATOR, 1, BACKWARD)) != NULL) {
+    while ((close = node_find(calc, calc->head, ")", STRING_TYPE, 1, FORWARD)) != NULL && (open = node_find(calc, close, "(", STRING_TYPE, 1, BACKWARD)) != NULL) {
         solve_calculation_bracket_pair(calc, open, close);
     }
 
@@ -173,19 +168,19 @@ void solve_calculation_range(struct doublist *calc, struct node *start, struct n
 
     /* Find the first division in the sub-calculation */
     struct node *n;
-    while ((n = node_find(c, c->head, "/", IS_OPERATOR, 1, FORWARD)) != NULL) {
+    while ((n = node_find(c, c->head, "/", STRING_TYPE, 1, FORWARD)) != NULL) {
         solve_division(c, n->prev, n->next);
     }
 
     /* Find the first multiplication of the sub-calculation */
-    while ((n = node_find(c, c->head, "*", IS_OPERATOR, 1, FORWARD)) != NULL) {
+    while ((n = node_find(c, c->head, "*", STRING_TYPE, 1, FORWARD)) != NULL) {
         solve_multiplication(c, n->prev, n->next);
     }
 
     /* Checks for two number after each another and add them
      * more information why no substraction is presend is in format_calculation */
     n = c->head;
-    while (n != NULL && n->type == IS_NUMBER && n->next != NULL && n->next->type == IS_NUMBER) {
+    while (n != NULL && n->type == DOUBLE_TYPE && n->next != NULL && n->next->type == DOUBLE_TYPE) {
 
         solve_addition(c, n, n->next);
     }
@@ -214,7 +209,7 @@ void solve_division(struct doublist *calc, struct node *num1, struct node *num2)
 
     /* Replace operator with the calculated number */
     struct node *operator = num1->next;
-    node_modify(calc, operator, node_create(xmemdup(&product, sizeof(product)), IS_NUMBER), sizeof(product), 1);
+    node_modify(calc, operator, node_create(xmemdup(&product, sizeof(product)), DOUBLE_TYPE), sizeof(product), 1);
 
     /* Frees both unneded numbers */
     node_free(calc, num1);
@@ -231,7 +226,7 @@ void solve_multiplication(struct doublist *calc, struct node *num1, struct node 
 
     /* Replace operator with the calculated number */
     struct node *operator = num1->next;
-    node_modify(calc, operator, node_create(xmemdup(&product, sizeof(product)), IS_NUMBER), sizeof(product), 1);
+    node_modify(calc, operator, node_create(xmemdup(&product, sizeof(product)), DOUBLE_TYPE), sizeof(product), 1);
 
     /* Frees both unneeded numbers */
     node_free(calc, num1);
@@ -247,7 +242,7 @@ void solve_addition(struct doublist *calc, struct node *num1, struct node *num2)
     double sum = ((double *) num1->value)[0] + ((double *) num2->value)[0];
 
     /* Replace first number (num1) with the calculated number */
-    node_modify(calc, num1, node_create(xmemdup(&sum, sizeof(sum)), IS_NUMBER), sizeof(sum), 1);
+    node_modify(calc, num1, node_create(xmemdup(&sum, sizeof(sum)), DOUBLE_TYPE), sizeof(sum), 1);
 
     /* Frees unneeded number */
     node_free(calc, num2);
@@ -263,22 +258,4 @@ double *strtofpntr(char *str) {
     fpntr = memmove(fpntr, &f, sizeof(double));
 
     return fpntr;
-}
-
-/* Only used for debugging */
-/* Prints an entire calculation */
-void print_calculation(struct doublist *calc) {
-
-    puts("\n\n\n");
-
-    struct node *n = calc->head;
-    while (n != NULL) {
-        if (n->type == IS_NUMBER)
-            printf("%f\n", ((double *) n->value)[0]);
-        else
-            puts(n->value);
-        n = n->next;
-    }
-
-    puts("\n\n\n");
 }

@@ -1,5 +1,6 @@
 #include "doublist.h"
 
+#include <stdio.h>
 #include <string.h>
 
 #include "xmemtools.h"
@@ -14,7 +15,7 @@ struct doublist *doublist_create() {
 	return doublist;
 }
 
-struct node *node_create(void *value, int type) {
+struct node *node_create(void *value, enum node_types type) {
 	
 	struct node *node = xmalloc(sizeof(struct node));
 	node->next = NULL;
@@ -120,7 +121,7 @@ void node_insert_before(struct doublist *doublist, struct node *node, struct nod
  * If start is NULL start from head or tal depending on the direction.
  * If size == 0 then the return will be the first node that matches the type.
  * If no node mathes NULL is returned. */
-struct node *node_find(struct doublist *doublist, struct node *start, void *value, int type, unsigned long size, int direction) {
+struct node *node_find(struct doublist *doublist, struct node *start, void *value, enum node_types type, unsigned long size, int direction) {
 
 	if (start == NULL) {
 		if (direction == FORWARD) {
@@ -225,4 +226,67 @@ void node_free(struct doublist *doublist, struct node *node) {
 int doublist_get_size(struct doublist *doublist) {
 	return doublist->size;
 
+}
+
+/* ATTENTION THIS SHOULD NOT BE USED NORMALLY ITS DESIGNED TO DEBUG */
+void doublist_print(struct doublist *doublist) {
+    
+    ITER_DOUBLIST(doublist, n, 
+        switch (n->type) {
+            case NULL_TYPE:
+                puts("NODE IS NULL");
+                break;
+            case CHAR_TYPE:
+                printf("%c\n", ((char *) n->value)[0]);
+                break;
+            case SHORT_TYPE:
+                printf("%d\n", ((short *) n->value)[0]);
+                break;
+            case INT_TYPE:
+                printf("%d\n", ((int *) n->value)[0]);
+                break;
+            case LONG_TYPE:
+                printf("%d\n", ((char *) n->value)[0]);
+                break;
+            case LONG_LONG_TYPE:
+                printf("%d\n", ((char *) n->value)[0]);
+                break;
+            case FLOAT_TYPE:
+                printf("%f\n", ((float *) n->value)[0]);
+                break;
+            case DOUBLE_TYPE:
+                printf("%f\n", ((double *) n->value)[0]);
+                break;
+            case STRING_TYPE:
+                printf("%s\n", (char *) n->value);
+                break;
+            case UNSIGNED_CHAR_TYPE:
+                printf("%u\n", ((unsigned int *) n->value)[0]);
+                break;
+            case UNSIGNED_SHORT_TYPE:
+                printf("%u\n", ((unsigned int *) n->value)[0]);
+                break;
+            case UNSIGNED_INT_TYPE:
+                printf("%u\n", ((unsigned int *) n->value)[0]);
+                break;
+            case UNSIGNED_LONG_TYPE:
+                printf("%lu\n", ((unsigned long *) n->value)[0]);
+                break;
+            case UNSIGNED_LONG_LONG_TYPE:
+                printf("%llu\n", ((unsigned long long *) n->value)[0]);
+                break;
+            case STRUCT_TYPE:
+                puts("NODE IS A STRUCT");
+                break;
+            case UNION_TYPE:
+                puts("NODE IS A UNION");
+                break;
+            case ENUM_TYPE:
+                printf("NODE IS A ENUM (%d)\n", ((int *) n->value)[0]);
+                break;
+            default:
+                puts("NODE HAS AN UNKNOWN TYPE\n");
+                break;
+        }
+    )
 }

@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS := -std=gnu89 -Wall -Wextra -g
+CFLAGS := -Wall -Wextra -g
 SRC := src
 INCLUDE := include
 
